@@ -75,7 +75,6 @@ window.initMap = () => {
     lat: 40.722216,
     lng: -73.987501
   };
-  console.log('test init map00');
   self.map = new google.maps.Map(document.getElementById('map'), {
     zoom: 12,
     center: loc,
@@ -139,9 +138,10 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
-  const image = document.createElement('img');
+  const image = document.createElement('div');
+  image.style.backgroundImage = "url(" + DBHelper.imageUrlForRestaurant(restaurant) + ")";
   image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+ // image.src = DBHelper.imageUrlForRestaurant(restaurant);
   li.append(image);
 
   const name = document.createElement('h1');
