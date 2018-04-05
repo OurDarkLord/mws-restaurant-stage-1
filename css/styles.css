@@ -116,6 +116,9 @@ nav h1 a {
   width: 100%;
   background-color: #ccc;
 }
+.gm-style button:focus, .gm-style a:focus, .gm-style-mtc div:focus {
+  box-shadow: 0px 0px 5px 5px #ff7e00!important;
+}
 /* ====================== Restaurant Filtering ====================== */
 .filter-options {
   width: 100%;
@@ -151,6 +154,9 @@ nav h1 a {
   min-width: 200px;
   flex: 0 1 auto;
 }
+.filter-options select:focus {
+  box-shadow: 0px 0px 5px 5px #2100ff;
+}
 
 /* ====================== Restaurant Listing ====================== */
 #restaurants-list {
@@ -161,6 +167,7 @@ nav h1 a {
   text-align: center;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 }
 #restaurants-list li {
   background-color: #fff;
@@ -184,8 +191,7 @@ nav h1 a {
   max-width: 100%;
   min-height: 248px;
   min-width: 100%;
-  background-size: cover;
-  background-position: center; 
+  object-fit: cover;
 }
 #restaurants-list li h1 {
   color: #f18200;
@@ -212,6 +218,10 @@ nav h1 a {
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
+}
+#restaurants-list li a:focus {
+  box-shadow: 0px 0px 5px 5px #ff7e00;
+  border-bottom: none;
 }
 
 /* ====================== Restaurant Details ====================== */
