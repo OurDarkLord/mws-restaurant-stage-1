@@ -23,9 +23,18 @@ self.addEventListener('install', function(event) {
 /**
  * Intercept request and returns the cache of it.
  * If there is no cache of it, save it in cache.
+ * Ignore the google maps fetches
  */
 self.addEventListener('fetch', function(event){
-    event.respondWith(CacheFetch(event.request))
+    if (event.request.url.indexOf('maps') > 0) {
+        event.respondWith(
+            fetch(event.request).then(function (response) {
+                return response;
+            })
+        );
+    } else {
+        event.respondWith(CacheFetch(event.request));
+    }
 });
 
 CacheFetch = (request) => {

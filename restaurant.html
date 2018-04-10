@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="css/styles.css" type="text/css">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Restaurant Info</title>
+  <title title="Restaurant Reviews">Restaurant Info</title>
 </head>
 
 <body class="inside">
@@ -19,7 +19,7 @@
       <h1><a href="/" aria-label="Home">Restaurant Reviews</a></h1>
     </nav>
     <!-- Beginning breadcrumb -->
-    <ul id="breadcrumb" aria-label="Navigation menu" >
+    <ul id="breadcrumb" aria-label="Navigation menu" role="navigation">
       <li><a href="/">Home</a></li>
     </ul>
     <!-- End breadcrumb -->
@@ -32,8 +32,10 @@
     <!-- Beginning restaurant -->
     <section id="restaurant-container" tabindex="1">
         <h1 id="restaurant-name"></h1>
-        <div id="restaurant-img"></div>
-        <p id="restaurant-cuisine"></p>
+        <div class="restaurant-img-div">
+          <img id="restaurant-img"></img>
+          <p id="restaurant-cuisine"></p>
+        </div>
         <p id="restaurant-address"></p>
         <table id="restaurant-hours"></table>
     </section>
@@ -44,8 +46,8 @@
     </section>
     <!-- End reviews -->
     <!-- Beginning map -->
-    <section id="map-container">
-      <div id="map"></div>
+    <section id="map-container" aria-hidden=true tabindex="-1">
+      <div id="map" tabindex="-1" role="application"></div>
     </section>
     <!-- End map -->
   </main>
