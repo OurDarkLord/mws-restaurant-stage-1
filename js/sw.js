@@ -47,5 +47,5 @@ CacheFetch = (request) => {
             });
         });
     });
-}
+};
 
