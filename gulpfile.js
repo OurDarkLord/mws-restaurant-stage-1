@@ -4,6 +4,7 @@ var sass = require('gulp-sass');
 var autoprefixer = require('gulp-autoprefixer'); // Zorgt dat CSS gemaakt wordt voor al de browsers.
 var eslint = require('gulp-eslint');             // Code styling
 
+var concat = require('gulp-concat');             // Bundeld al de javascript, voegd functies samen etc.
 var uglify = require('gulp-uglify');             // Maakt een minified bestand ervan.
 
 var babel = require('gulp-babel');               // Cross browser.
@@ -13,6 +14,11 @@ var sourcemaps = require('gulp-sourcemaps');     // Om te kunnen debuggen.
 var imagemin = require('gulp-imagemin');         // Maakt images kleiner.
 var pngquant = require('imagemin-pngquant'); 
 
+var babelify = require('babelify');
+var hbsfy = require('hbsfy');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
+
 gulp.task('default',['styles', 'lint', 'copy-html','copy-images','scripts' ], function() {
 	gulp.watch( 'sass/**/*.scss', ['styles']);
 	gulp.watch( 'js/**/*.js', ['lint']);
@@ -20,7 +26,7 @@ gulp.task('default',['styles', 'lint', 'copy-html','copy-images','scripts' ], fu
     gulp.watch('/restaurant.html', ['copy-html']);
 });
 
-gulp.task( 'dist',['styles', 'lint', 'copy-html','images-compress','scripts-dist' ]);
+gulp.task( 'dist',['styles', 'copy-html','images-compress','scripts', 'build']);
 
 gulp.task('styles', function() {
 	gulp.src('sass/**/*.scss') // Alle .scss files in de folder / sub folders.
@@ -49,16 +55,13 @@ gulp.task('copy-images', function() {
 		.pipe(gulp.dest('./dist/img'));
 });
 
+
 gulp.task('scripts', function() {
-	gulp.src('js/**/*.js')
-		//.pipe(babel())   // Still a problem when converting static in classes.
-		.pipe(gulp.dest('dist/js'));
-});
-gulp.task('scripts-dist', function() {
-	gulp.src('js/**/*.js')
-		//.pipe(babel())   // Still a problem when converting static in classes.
+
+	gulp.src('js/*.js')
+		.pipe(babel())   // Still a problem when converting static in classes.
 		.pipe(sourcemaps.init())
-		//.pipe(uglify()) // Still a problem when converting static in classes.
+		.pipe(uglify()) // Still a problem when converting static in classes.
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('dist/js'));
 });
@@ -71,3 +74,11 @@ gulp.task('images-compress', function() {
         }))
         .pipe(gulp.dest('dist/img'));
 });
+
+gulp.task('build', function () {
+    return browserify({entries: 'js/common/dbhelper.js', extensions: ['.js'], debug: true})
+		.transform(babelify, { stage: 1})
+        .bundle()
+        .pipe(source('dbhelper.js'))
+        .pipe(gulp.dest('dist/js'));
+})
