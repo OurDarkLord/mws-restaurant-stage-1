@@ -26,7 +26,7 @@ gulp.task('default',['styles', 'lint', 'copy-html','copy-images','scripts' ], fu
     gulp.watch('/restaurant.html', ['copy-html']);
 });
 
-gulp.task( 'dist',['styles', 'copy-html','images-compress','scripts', 'build']);
+gulp.task( 'dist',['styles', 'copy-html','images-compress','scripts', 'build', 'idb']);
 
 gulp.task('styles', function() {
 	gulp.src('sass/**/*.scss') // Alle .scss files in de folder / sub folders.
@@ -76,9 +76,36 @@ gulp.task('images-compress', function() {
 });
 
 gulp.task('build', function () {
-    return browserify({entries: 'js/common/dbhelper.js', extensions: ['.js'], debug: true})
-		.transform(babelify, { stage: 1})
+    /*return browserify({entries: 'js/common/dbhelper.js', extensions: ['.js'], debug: true})
+        .transform([
+			'babelify', {
+				presets: ['es2015'],
+				ignore: ['/src/libs/**']
+			}
+		])
         .bundle()
         .pipe(source('dbhelper.js'))
-        .pipe(gulp.dest('dist/js'));
+		.pipe(gulp.dest('dist/js'));*/
+		gulp.src('js/common/*.js')
+		.pipe(gulp.dest('dist/js'));
+		
+})
+gulp.task('test',['build'] , function() {
+	gulp.watch( 'js/common/*.js', ['build']);
+})
+
+gulp.task('idb', function () {
+    /*return browserify({entries: 'js/common/dbhelper.js', extensions: ['.js'], debug: true})
+        .transform([
+			'babelify', {
+				presets: ['es2015'],
+				ignore: ['/src/libs/**']
+			}
+		])
+        .bundle()
+        .pipe(source('dbhelper.js'))
+		.pipe(gulp.dest('dist/js'));*/
+		gulp.src('node_modules/idb/lib/idb.js')
+		.pipe(gulp.dest('dist/js'));
+		
 })
