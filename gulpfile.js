@@ -19,14 +19,14 @@ var hbsfy = require('hbsfy');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 
-gulp.task('default',['styles', 'lint', 'copy-html','copy-images','scripts' ], function() {
-	gulp.watch( 'sass/**/*.scss', ['styles']);
-	gulp.watch( 'js/**/*.js', ['lint']);
-    gulp.watch('/index.html', ['copy-html']);
+/*gulp.task('default',['styles', 'lint', 'copy-html','copy-images','scripts' ], function() {
+*///	gulp.watch( 'sass/**/*.scss', ['styles']);
+//	gulp.watch( 'js/**/*.js', ['lint']);
+/*    gulp.watch('/index.html', ['copy-html']);
     gulp.watch('/restaurant.html', ['copy-html']);
-});
+});*/
 
-gulp.task( 'dist',['styles', 'copy-html','images-compress','scripts', 'build', 'idb']);
+gulp.task( 'dist',['styles', 'copy-html','images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb']);
 
 gulp.task('styles', function() {
 	gulp.src('sass/**/*.scss') // Alle .scss files in de folder / sub folders.
@@ -55,7 +55,10 @@ gulp.task('copy-images', function() {
 		.pipe(gulp.dest('./dist/img'));
 });
 
-
+gulp.task('copy-manifest', function() {
+	gulp.src('./manifest')
+		.pipe(gulp.dest('./dist'));
+});
 gulp.task('scripts', function() {
 
 	gulp.src('js/*.js')
@@ -86,8 +89,8 @@ gulp.task('build', function () {
         .bundle()
         .pipe(source('dbhelper.js'))
 		.pipe(gulp.dest('dist/js'));*/
-		gulp.src('js/common/*.js')
-		.pipe(gulp.dest('dist/js'));
+	gulp.src('js/common/*.js')
+	.pipe(gulp.dest('dist/js'));
 		
 })
 gulp.task('test',['build'] , function() {

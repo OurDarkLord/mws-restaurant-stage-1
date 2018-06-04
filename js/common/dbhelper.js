@@ -15,8 +15,10 @@ class DBHelper {
 
   /**
    * Fetch all restaurants.
+   * If the user is ofline try to fetch the restaurants from the db
    */
   static fetchRestaurants(callback) {
+    
     fetch(DBHelper.DATABASE_URL).then( (res) => {
       if (res.status === 200) { // Got a success response from server!
         res.json().then( (restaurants) => {
@@ -41,7 +43,24 @@ class DBHelper {
         const error = (`Request failed. Returned status of ${res.status}`);
         return callback(error, null);
       } 
-    }).catch( (err) => callback(`Request failed. Returned status of ${err}`, null) );
+    }).catch( (err) => {
+      let open = idb.open("restaurants", 1);
+      open.then((db) => {
+        let tx = db.transaction('restaurants', 'readonly');
+        let keyValStore = tx.objectStore('restaurants');
+        return keyValStore.getAll();
+      }).then((val, error) => {
+        if (error) {
+          callback(error, null);
+        } else {
+          if (val) { // Got the restaurant
+            callback(null, val);
+          } else { // Restaurant does not exist in the database
+            callback('Request failed.', null);
+          }
+        }
+      }).catch((error) => { callback(`Request failed. Returned status of ${err}`, null); });
+    });
   }
 
   /**
@@ -223,4 +242,15 @@ class DBHelper {
     return marker;
   }
 
+}
+
+/**
+ * Registration of the service worker
+ */
+if(navigator.serviceWorker){
+  navigator.serviceWorker.register('./js/sw.js').then(function(reg){
+      console.log('registerd to the SW');
+    }).catch(function(err){
+      console.log("can't register to the service worker.");
+  });
 }

@@ -26,7 +26,7 @@ self.addEventListener('install', function(event) {
  * Ignore the google maps fetches
  */
 self.addEventListener('fetch', function(event){
-    if (event.request.url.indexOf('maps') > 0) {
+    if (event.request.url.indexOf('maps') > 0 || event.request.url.indexOf('restaurants') > 0 ) {
         event.respondWith(
             fetch(event.request).then(function (response) {
                 return response;
@@ -40,7 +40,9 @@ self.addEventListener('fetch', function(event){
 CacheFetch = (request) => {
     return caches.open('fetchRequests').then(function(cache) {
         return cache.match(request.url).then(function(response) {
-            if (response) return response;
+            if (response){
+                return response;
+            } 
             return fetch(request).then(function(networkResponse) {
                 cache.put(request.url, networkResponse.clone());
                 return networkResponse;
