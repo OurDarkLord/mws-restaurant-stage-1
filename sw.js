@@ -10,6 +10,8 @@ self.addEventListener('install', function(event) {
             return cache.addAll(
                 [
                     '/',
+                    '/index.html',
+                    '/restaurant.html',
                     '/css/styles.css',
                     '/js/main.js',
                     '/js/restaurant_info.js',
@@ -34,7 +36,7 @@ self.addEventListener('fetch', function(event){
             })
         );
     } else {
-        event.respondWith(new Response(CacheFetch(event.request)));
+        event.respondWith(CacheFetch(event.request));
     }
 });
 
@@ -51,4 +53,3 @@ CacheFetch = (request) => {
         });
     });
 };
-
