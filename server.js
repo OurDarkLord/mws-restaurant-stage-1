@@ -1,6 +1,7 @@
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
+var url = require("url");
 
 http.createServer(function (request, response) {
     console.log('request starting...');
@@ -18,8 +19,15 @@ http.createServer(function (request, response) {
     response.setHeader('Access-Control-Allow-Credentials', true);
 
     var filePath = '.' + request.url;
+    var parsed = url.parse(request.url);
     if (filePath == './')
+    {
         filePath = './index.html';
+    } else if(  path.basename(parsed.pathname) == "restaurant.html" ) {
+        filePath ='./restaurant.html';
+    }
+        
+        
 
     var extname = path.extname(filePath);
     var contentType = 'text/html';

@@ -4,7 +4,7 @@
   "description": "Udacity web program exercise.",
   "main": "js/main.js",
   "scripts": {
-    "start": "( cd dist && nodemon server.js --exec babel-node --presets es2015,stage-2)",
+    "start": "gulp dist && ( cd dist && nodemon server.js --exec babel-node --presets es2015,stage-2)",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
