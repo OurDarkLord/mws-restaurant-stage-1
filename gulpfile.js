@@ -26,7 +26,7 @@ var source = require('vinyl-source-stream');
     gulp.watch('/restaurant.html', ['copy-html']);
 });*/
 
-gulp.task( 'dist',['styles', 'copy-html','images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb']);
+gulp.task( 'dist',['styles', 'copy-html','images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb', 'copy-server']);
 
 gulp.task('styles', function() {
 	gulp.src('sass/**/*.scss') // Alle .scss files in de folder / sub folders.
@@ -56,9 +56,13 @@ gulp.task('copy-images', function() {
 });
 
 gulp.task('copy-manifest', function() {
-	gulp.src('./manifest')
+	gulp.src('./manifest.json')
 		.pipe(gulp.dest('./dist'));
 });
+gulp.task('copy-server', function() {
+	gulp.src('./server.js')
+		.pipe(gulp.dest('./dist'));
+})
 gulp.task('scripts', function() {
 
 	gulp.src('js/*.js')

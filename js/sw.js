@@ -33,7 +33,7 @@ self.addEventListener('fetch', function(event){
             })
         );
     } else {
-        event.respondWith(CacheFetch(event.request));
+        event.respondWith(new Response(CacheFetch(event.request)));
     }
 });
 

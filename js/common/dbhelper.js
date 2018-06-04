@@ -22,13 +22,22 @@ class DBHelper {
     fetch(DBHelper.DATABASE_URL).then( (res) => {
       if (res.status === 200) { // Got a success response from server!
         res.json().then( (restaurants) => {
-          var db = idb.open('restaurants' , 1, function(db) {
-            var store = db.createObjectStore('restaurants', {
-              keyPath: 'id'
-            });
-            store.createIndex('by-id', 'id');
-            store.createIndex('cuisine', 'cuisine_type');
-            store.createIndex('neighborhood', 'neighborhood');
+          var db = idb.open('restaurants' , 3, function(db) {
+            switch(db.oldVersion) {
+              case 0:
+                var store = db.createObjectStore('restaurants', {
+                  keyPath: 'id'
+                });
+                store.createIndex('by-id', 'id');
+              case 1:
+                var tx = db.transaction.objectStore('restaurants', 'readwrite');
+                tx.createIndex('cuisine', 'cuisine_type');
+              case 2: 
+                var tx2 = db.transaction.objectStore('restaurants', 'readwrite');
+                tx2.createIndex('neighborhood', 'neighborhood');
+            }
+            
+            
           }).then( (db) => {
             var tx = db.transaction('restaurants', 'readwrite');
             var store = tx.objectStore('restaurants');
@@ -44,7 +53,7 @@ class DBHelper {
         return callback(error, null);
       } 
     }).catch( (err) => {
-      let open = idb.open("restaurants", 1);
+      let open = idb.open("restaurants", 3);
       open.then((db) => {
         let tx = db.transaction('restaurants', 'readonly');
         let keyValStore = tx.objectStore('restaurants');
@@ -69,7 +78,7 @@ class DBHelper {
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
     id = parseInt(id);
-    let open = idb.open("restaurants", 1);
+    let open = idb.open("restaurants", 3);
     open.then((db) => {
       let tx = db.transaction('restaurants', 'readonly');
       let keyValStore = tx.objectStore('restaurants');
@@ -95,7 +104,7 @@ class DBHelper {
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
     // Fetch all restaurants  with proper error handling
-    let open = idb.open("restaurants", 1);
+    let open = idb.open("restaurants", 3);
     open.then((db) => {
       let tx = db.transaction('restaurants');
       let keyValStore = tx.objectStore('restaurants', 'readonly');
@@ -117,7 +126,7 @@ class DBHelper {
    */
   static fetchRestaurantByNeighborhood(neighborhood, callback) {
     // Fetch all restaurants
-    let open = idb.open("restaurants", 1);
+    let open = idb.open("restaurants", 3);
     open.then((db) => {
       let tx = db.transaction('restaurants');
       let keyValStore = tx.objectStore('restaurants', 'readonly');
@@ -140,7 +149,7 @@ class DBHelper {
   static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
     let filteredRestaurants = [];
-    let open = idb.open('restaurants', 1);
+    let open = idb.open('restaurants', 3);
     open.then((db) => {
       let tx = db.transaction('restaurants');
       let keyValStore = tx.objectStore('restaurants', 'readonly');
