@@ -15,9 +15,10 @@ var imagemin = require('gulp-imagemin');         // Maakt images kleiner.
 var pngquant = require('imagemin-pngquant'); 
 
 var babelify = require('babelify');
-var hbsfy = require('hbsfy');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
+
+const del = require('del'); //let you delete a folder.
 
 /*gulp.task('default',['styles', 'lint', 'copy-html','copy-images','scripts' ], function() {
 *///	gulp.watch( 'sass/**/*.scss', ['styles']);
@@ -26,7 +27,11 @@ var source = require('vinyl-source-stream');
     gulp.watch('/restaurant.html', ['copy-html']);
 });*/
 
-gulp.task( 'dist',['styles', 'copy-html','images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb', 'copy-sw', 'copy-server']);
+gulp.task( 'dist',['clean', 'styles', 'copy-html','images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb', 'copy-sw', 'copy-server']);
+
+gulp.task('clean', function(){
+	return del('dist/**', {force:true});
+});
 
 gulp.task('styles', function() {
 	gulp.src('sass/**/*.scss') // Alle .scss files in de folder / sub folders.
