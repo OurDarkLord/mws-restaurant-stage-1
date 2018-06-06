@@ -86,7 +86,7 @@ gulp.task('images-compress', function() {
     return gulp.src('img/*')
         .pipe(imagemin({
             progressive: true,
-            use: [pngquant({quality: '50'}, {verbose: true})]
+            use: [pngquant({quality: '10'}, {verbose: true})]
         }))
         .pipe(gulp.dest('dist/img'));
 });

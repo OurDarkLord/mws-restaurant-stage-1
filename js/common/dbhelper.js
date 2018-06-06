@@ -14,62 +14,42 @@ class DBHelper {
   }
 
   /**
-   * Fetch all restaurants.
-   * If the user is ofline try to fetch the restaurants from the db
+   * Create indexdb database
    */
-  static fetchRestaurants(callback) {
+  static createDatabase(callback) { 
+    var db = idb.open('restaurants' , 1, function(db) {
     
-    fetch(DBHelper.DATABASE_URL).then( (res) => {
-      if (res.status === 200) { // Got a success response from server!
-        res.json().then( (restaurants) => {
-          var db = idb.open('restaurants' , 3, function(db) {
-            switch(db.oldVersion) {
-              case 0:
                 var store = db.createObjectStore('restaurants', {
                   keyPath: 'id'
                 });
                 store.createIndex('by-id', 'id');
-              case 1:
-                var tx = db.transaction.objectStore('restaurants', 'readwrite');
-                tx.createIndex('cuisine', 'cuisine_type');
-              case 2: 
-                var tx2 = db.transaction.objectStore('restaurants', 'readwrite');
-                tx2.createIndex('neighborhood', 'neighborhood');
+      store.createIndex('cuisine', 'cuisine_type');
+      store.createIndex('neighborhood', 'neighborhood');
+    });
             }
+  /**
+   * Fetch all restaurants.
+   */
+  static fetchRestaurants(callback) {
             
-            
-          }).then( (db) => {
+    fetch(DBHelper.DATABASE_URL).then( (res) => {
+      if (res.status === 200) { // Got a success response from server!
+        res.json().then((restaurants) => {
+          var db = idb.open('restaurants' , 1);
+          db.then((db) => {
             var tx = db.transaction('restaurants', 'readwrite');
             var store = tx.objectStore('restaurants');
             restaurants.forEach(element => {
               store.put(element);
             });
-          });
           return callback(null,restaurants);
         });
-        
+        });
       } else { // Oops!. Got an error from server.
         const error = (`Request failed. Returned status of ${res.status}`);
         return callback(error, null);
       } 
-    }).catch( (err) => {
-      let open = idb.open("restaurants", 3);
-      open.then((db) => {
-        let tx = db.transaction('restaurants', 'readonly');
-        let keyValStore = tx.objectStore('restaurants');
-        return keyValStore.getAll();
-      }).then((val, error) => {
-        if (error) {
-          callback(error, null);
-        } else {
-          if (val) { // Got the restaurant
-            callback(null, val);
-          } else { // Restaurant does not exist in the database
-            callback('Request failed.', null);
-          }
-        }
       }).catch((error) => { callback(`Request failed. Returned status of ${err}`, null); });
-    });
   }
 
   /**
@@ -78,7 +58,7 @@ class DBHelper {
   static fetchRestaurantById(id, callback) {
     // fetch all restaurants with proper error handling.
     id = parseInt(id);
-    let open = idb.open("restaurants", 3);
+    let open = idb.open("restaurants", 1);
     open.then((db) => {
       let tx = db.transaction('restaurants', 'readonly');
       let keyValStore = tx.objectStore('restaurants');
@@ -104,7 +84,7 @@ class DBHelper {
    */
   static fetchRestaurantByCuisine(cuisine, callback) {
     // Fetch all restaurants  with proper error handling
-    let open = idb.open("restaurants", 3);
+    let open = idb.open("restaurants", 1);
     open.then((db) => {
       let tx = db.transaction('restaurants');
       let keyValStore = tx.objectStore('restaurants', 'readonly');
@@ -126,7 +106,7 @@ class DBHelper {
    */
   static fetchRestaurantByNeighborhood(neighborhood, callback) {
     // Fetch all restaurants
-    let open = idb.open("restaurants", 3);
+    let open = idb.open("restaurants", 1);
     open.then((db) => {
       let tx = db.transaction('restaurants');
       let keyValStore = tx.objectStore('restaurants', 'readonly');
@@ -149,7 +129,7 @@ class DBHelper {
   static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
     // Fetch all restaurants
     let filteredRestaurants = [];
-    let open = idb.open('restaurants', 3);
+    let open = idb.open('restaurants', 1);
     open.then((db) => {
       let tx = db.transaction('restaurants');
       let keyValStore = tx.objectStore('restaurants', 'readonly');
@@ -234,7 +214,7 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return restaurant.photograph ? (`/img/${restaurant.photograph}.jpg`) : null;
+    return restaurant.photograph ? (`/img/${restaurant.photograph}`) : null;
   }
 
   /**

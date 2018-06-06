@@ -9,9 +9,21 @@ var markers = [];
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+  createDatabase();
   fetchNeighborhoods();
   fetchCuisines();
 });
+
+/**
+ * Create a database
+ */
+var createDatabase = () => {
+  DBHelper.createDatabase((error) => {
+    if (error) { // Got an error
+      console.error(error);
+    }
+  });
+};
 
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -141,13 +153,22 @@ var createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
   const restaurantImg = DBHelper.imageUrlForRestaurant(restaurant);
   if (restaurantImg) {
+    const pictureTag = document.createElement('picture');
+    const sourceWebP = document.createElement('source');
+    const sourceJpg = document.createElement('source');
     const image = document.createElement('img');
+    sourceWebP.srcset = `${restaurantImg}.webp`;
+    sourceJpg.srcset = `${restaurantImg}.jpg`;
     image.className = 'restaurant-img';
     image.alt = "An image from the restaurant " + restaurant.name;
-    image.src = DBHelper.imageUrlForRestaurant(restaurant);
-    li.append(image);
+    image.src = `${restaurantImg}.jpg`;
+    pictureTag.append(sourceWebP);
+    pictureTag.append(sourceJpg);
+    pictureTag.append(image);
+    li.append(pictureTag);
+
   }
-  const name = document.createElement('h1');
+  const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   li.append(name);
 
