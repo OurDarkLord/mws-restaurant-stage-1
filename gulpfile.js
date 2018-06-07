@@ -27,7 +27,10 @@ const del = require('del'); //let you delete a folder.
     gulp.watch('/restaurant.html', ['copy-html']);
 });*/
 
-gulp.task( 'dist',['clean', 'styles', 'copy-html','images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb', 'copy-sw', 'copy-server']);
+gulp.task( 'delete-dist',['clean']);
+gulp.task( 'build-dist',['styles', 'copy-html','images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb','copy-sw']);
+//gulp.task( 'build-sw',[ 'generate-service-worker']);
+gulp.task( 'build-server',['copy-server']);
 
 gulp.task('clean', function(){
 	return del('dist/**', {force:true});
@@ -92,6 +95,10 @@ gulp.task('images-compress', function() {
 });
 
 gulp.task('build', function () {
+
+	// Doesn't work that well, get some errors in browser.
+	// Babel doesn't transpile it well. (in progress)
+
     /*return browserify({entries: 'js/common/dbhelper.js', extensions: ['.js'], debug: true})
         .transform([
 			'babelify', {
@@ -111,6 +118,10 @@ gulp.task('test',['build'] , function() {
 })
 
 gulp.task('idb', function () {
+
+	// Doesn't work that well, get some errors in browser.
+	// Babel doesn't transpile it well. (in progress)
+
     /*return browserify({entries: 'js/common/dbhelper.js', extensions: ['.js'], debug: true})
         .transform([
 			'babelify', {
@@ -124,4 +135,15 @@ gulp.task('idb', function () {
 		gulp.src('node_modules/idb/lib/idb.js')
 		.pipe(gulp.dest('dist/js'));
 		
-})
+});
+
+// Still experimental 
+gulp.task('generate-service-worker', function(callback) {
+	var swPrecache = require('sw-precache');
+	var rootDir = 'dist';
+  
+	swPrecache.write(`${rootDir}/sw.js`, {
+	  staticFileGlobs: [rootDir + '/**/*.{js,html,css,jpg,webp}'],
+	  stripPrefix: rootDir
+	}, callback);
+  });

@@ -55,14 +55,24 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
-  const image = document.getElementById('restaurant-img');
+  const pictureTag = document.getElementById('restaurant-img');
   const img_url = DBHelper.imageUrlForRestaurant(restaurant);
   if (img_url) {
-    image.className = 'restaurant-img';
+
+    pictureTag.className = 'restaurant-img';
+    const sourceWebP = document.createElement('source');
+    const sourceJpg = document.createElement('source');
+    const image = document.createElement('img');
+    sourceWebP.srcset = `${img_url}.webp`;
+    sourceJpg.srcset = `${img_url}.jpg`;
     image.alt = "An image from the restaurant " + restaurant.name;
-    image.src = DBHelper.imageUrlForRestaurant(restaurant);
+    image.src = `${img_url}.jpg`;
+    pictureTag.append(sourceWebP);
+    pictureTag.append(sourceJpg);
+    pictureTag.append(image);
+
   } else {
-    image.remove();
+    pictureTag.remove();
   }
 
 

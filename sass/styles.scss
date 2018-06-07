@@ -195,6 +195,9 @@ nav h1 a {
   min-height: 248px;
   min-width: 100%;
   object-fit: cover;
+  img {
+    width: 100%;
+  }
 }
 #restaurants-list li h1 {
   color: #854000;
@@ -275,7 +278,10 @@ nav h1 a {
   line-height: 1.1;
 }
 #restaurant-img {
-	width: 100%;
+  width: 100%;
+  img {
+    width: 100%;
+  }
 }
 #restaurant-address {
   font-size: 12pt;
