@@ -41,7 +41,8 @@ gulp.task('styles', function() {
 		.pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError)) // Zet de scss om.
 		.pipe(autoprefixer({
 			browsers: ['last 2 versions']
-		})) // Laaste 2 version van alle browsers prefixes fixen.
+		})) // last 2 versions of all browsers prefixes fix;
+		//.pipe(uglify())
 		.pipe(gulp.dest('dist/css'));
 });
 
@@ -133,6 +134,7 @@ gulp.task('idb', function () {
         .pipe(source('dbhelper.js'))
 		.pipe(gulp.dest('dist/js'));*/
 		gulp.src('node_modules/idb/lib/idb.js')
+		.pipe(uglify())
 		.pipe(gulp.dest('dist/js'));
 		
 });
