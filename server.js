@@ -1,73 +1,36 @@
 var http = require('http');
-var fs = require('fs');
 var path = require('path');
-var url = require("url");
+var express = require("express");
+var app = express();
+var cors = require('cors'); // toelaten voor cross domain 
+var port = process.env.PORT || 8000; // website + API zal openstaan op poort 80
+var expressStaticGzip = require("express-static-gzip");
 
-http.createServer(function (request, response) {
-    console.log('request starting...');
-    // Website you wish to allow to connect
-    response.setHeader('Access-Control-Allow-Origin', '*');
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methodes", "GET,PUT,POST,DELETE");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+});
+var originsWhitelist = [
+    'http://localhost:8000'
+];
+   
+var corsOptions = {
+    origin: function(origin, callback){
+        var isWhitelisted = originsWhitelist.indexOf(origin) !== -1;
+        callback(null, isWhitelisted);
+    },
+    credentials:true
+}
+app.use(cors(corsOptions));
 
-    // Request methods you wish to allow
-    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+app.use(express.static(path.join(__dirname,'dist')),expressStaticGzip("dist", { indexFromEmptyFile: false })); // the map of the site
 
-    // Request headers you wish to allow
-    response.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+app.get('*', function(req, res, next) {
+	res.sendFile(path.join(__dirname + '/dist/index.html.gz'));
+});
 
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    response.setHeader('Access-Control-Allow-Credentials', true);
-
-    var filePath = '.' + request.url;
-    var parsed = url.parse(request.url);
-    if (filePath == './')
-    {
-        filePath = './index.html';
-    } else if(  path.basename(parsed.pathname) == "restaurant.html" ) {
-        filePath ='./restaurant.html';
-    }
-        
-        
-
-    var extname = path.extname(filePath);
-    var contentType = 'text/html';
-    switch (extname) {
-        case '.js':
-            contentType = 'text/javascript';
-            break;
-        case '.css':
-            contentType = 'text/css';
-            break;
-        case '.json':
-            contentType = 'application/json';
-            break;
-        case '.png':
-            contentType = 'image/png';
-            break;      
-        case '.jpg':
-            contentType = 'image/jpg';
-            break;
-    }
-
-    fs.readFile(filePath, function(error, content) {
-        if (error) {
-            if(error.code == 'ENOENT'){
-                fs.readFile('./404.html', function(error, content) {
-                    response.writeHead(200, { 'Content-Type': contentType });
-                    response.end(content, 'utf-8');
-                });
-            }
-            else {
-                response.writeHead(500);
-                response.end('Sorry, check with the site admin for error: '+error.code+' ..\n');
-                response.end(); 
-            }
-        }
-        else {
-            response.writeHead(200, { 'Content-Type': contentType });
-            response.end(content, 'utf-8');
-        }
-    });
-
-}).listen(8000);
-console.log('Server running at localhost:8000');
+var server = http.createServer(app).listen(port,function(){
+	console.log("serving https op poort "+port);
+});

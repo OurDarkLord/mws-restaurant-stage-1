@@ -18,19 +18,15 @@ var babelify = require('babelify');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 
-const del = require('del'); //let you delete a folder.
+const del = require('del'); 					 //let you delete a folder.
+var gzip = require('gulp-gzip'); 				 // zip files
+var cleanCSS = require('gulp-clean-css');		 //minify css + backwards compatible	
 
-/*gulp.task('default',['styles', 'lint', 'copy-html','copy-images','scripts' ], function() {
-*///	gulp.watch( 'sass/**/*.scss', ['styles']);
-//	gulp.watch( 'js/**/*.js', ['lint']);
-/*    gulp.watch('/index.html', ['copy-html']);
-    gulp.watch('/restaurant.html', ['copy-html']);
-});*/
 
 gulp.task( 'delete-dist',['clean']);
 gulp.task( 'build-dist',['styles', 'copy-html','images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb','copy-sw']);
 //gulp.task( 'build-sw',[ 'generate-service-worker']);
-gulp.task( 'build-server',['copy-server']);
+
 
 gulp.task('clean', function(){
 	return del('dist/**', {force:true});
@@ -42,7 +38,8 @@ gulp.task('styles', function() {
 		.pipe(autoprefixer({
 			browsers: ['last 2 versions']
 		})) // last 2 versions of all browsers prefixes fix;
-		//.pipe(uglify())
+		.pipe(cleanCSS({compatibility: 'ie9'}))
+		.pipe(gzip())
 		.pipe(gulp.dest('dist/css'));
 });
 
@@ -56,12 +53,9 @@ gulp.task('lint',  function() {
 gulp.task('copy-html', function() {
 	gulp.src('./index.html')
         .pipe(gulp.dest('./dist'));
-    gulp.src('./restaurant.html')
+	gulp.src('./restaurant.html')
+		.pipe(gzip())
 		.pipe(gulp.dest('./dist'));
-});
-gulp.task('copy-images', function() {
-	gulp.src('img/*')
-		.pipe(gulp.dest('./dist/img'));
 });
 
 gulp.task('copy-manifest', function() {
@@ -72,17 +66,14 @@ gulp.task('copy-sw', function() {
 	gulp.src('./sw.js')
 		.pipe(gulp.dest('./dist'));
 })
-gulp.task('copy-server', function() {
-	gulp.src('./server.js')
-		.pipe(gulp.dest('./dist'));
-})
-gulp.task('scripts', function() {
 
+gulp.task('scripts', function() {
 	gulp.src('js/*.js')
 		.pipe(babel())   // Still a problem when converting static in classes.
 		.pipe(sourcemaps.init())
 		.pipe(uglify()) // Still a problem when converting static in classes.
 		.pipe(sourcemaps.write())
+		.pipe(gzip())
 		.pipe(gulp.dest('dist/js'));
 });
 
@@ -91,7 +82,8 @@ gulp.task('images-compress', function() {
         .pipe(imagemin({
             progressive: true,
             use: [pngquant({quality: '10'}, {verbose: true})]
-        }))
+		}))
+		.pipe(gzip())
         .pipe(gulp.dest('dist/img'));
 });
 
@@ -111,6 +103,7 @@ gulp.task('build', function () {
         .pipe(source('dbhelper.js'))
 		.pipe(gulp.dest('dist/js'));*/
 	gulp.src('js/common/*.js')
+	.pipe(gzip())
 	.pipe(gulp.dest('dist/js'));
 		
 })
@@ -135,6 +128,7 @@ gulp.task('idb', function () {
 		.pipe(gulp.dest('dist/js'));*/
 		gulp.src('node_modules/idb/lib/idb.js')
 		.pipe(uglify())
+		.pipe(gzip())
 		.pipe(gulp.dest('dist/js'));
 		
 });
