@@ -49,7 +49,7 @@ class DBHelper {
         const error = (`Request failed. Returned status of ${res.status}`);
         return callback(error, null);
       } 
-      }).catch((error) => { callback(`Request failed. Returned status of ${err}`, null); });
+      }).catch((error) => { callback(`Request failed. Returned status of ${error}`, null); });
   }
 
   /**
@@ -240,6 +240,6 @@ if(navigator.serviceWorker){
   navigator.serviceWorker.register('./sw.js').then(function(reg){
       console.log('registerd to the SW');
     }).catch(function(err){
-      console.log("can't register to the service worker.");
+      console.log("can't register to the service worker.", err);
   });
 }
