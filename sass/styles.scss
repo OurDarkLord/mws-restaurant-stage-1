@@ -314,8 +314,12 @@ nav h1 a {
     width: 40%;
   }
 }
+#new-review {
+  margin: 0 5%;
+  padding: 50px 0;
+}
 #reviews-container {
-  padding: 10px 0 50px 0;
+  padding: 10px 0 100px 0;
 }
 #reviews-container h2 {
   color: #854000;
@@ -344,4 +348,33 @@ nav h1 a {
 }
 #restaurant-hours td {
   color: #666;
+}
+
+.statusMessage {
+  z-index: 99;
+  position: fixed;
+  bottom: 0px;
+  width: 100%;
+  text-align: center;
+  color: white;
+  font-size: 2rem;
+  div {
+    padding: 10px;
+  }
+  transition: 200ms transform ease-in-out;
+  transform: translateY(100%);
+}
+.statusMessage.active {
+  transform: translateY(0%);
+}
+.statusMessage .failed {
+  background-color: #800000;
+  button {
+    background-color: white;
+    padding: 5px 10px;
+    font-size: 1.2rem;
+  }
+}
+.statusMessage .success {
+  background-color: #008000;
 }

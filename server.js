@@ -7,13 +7,15 @@ var port = process.env.PORT || 8000; // website + API zal openstaan op poort 80
 var expressStaticGzip = require("express-static-gzip");
 
 app.use(function(req, res, next) {
+    req.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methodes", "GET,PUT,POST,DELETE");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     next();
 });
 var originsWhitelist = [
-    'http://localhost:8000'
+    'http://localhost:8000',
+    'http://localhost:1337'
 ];
    
 var corsOptions = {

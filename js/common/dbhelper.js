@@ -12,6 +12,10 @@ class DBHelper {
     const port = 1337; // Change this to your server port
     return `http://localhost:${port}/restaurants`;
   }
+  static get DATABASE_URL_Reviews() {
+    const port = 1337; // Change this to your server port
+    return `http://localhost:${port}/reviews`;
+  }
 
   /**
    * Create indexdb database
@@ -52,6 +56,21 @@ class DBHelper {
       }).catch((error) => { callback(`Request failed. Returned status of ${error}`, null); });
   }
 
+  static fetchReviewsOfRestaurant(id, callback) {
+    fetch(`${DBHelper.DATABASE_URL_Reviews}/?restaurant_id=${id}`).then( (res) => {
+      if (res.status === 200) {
+        res.json().then((reviews) => {
+          return callback(null,reviews);
+        });
+        
+      }
+      else {
+        const error = (`Request failed. Returned status of ${res.status}`);
+        return callback(error, null);
+      }
+    }).catch((error) => { callback(`Request failed. Returned status of ${error}`, null); });
+  }
+
   /**
    * Fetch a restaurant by its ID.
    */
@@ -62,7 +81,6 @@ class DBHelper {
     open.then((db) => {
       let tx = db.transaction('restaurants', 'readonly');
       let keyValStore = tx.objectStore('restaurants');
-      console.log(keyValStore.get(id));
       return keyValStore.get(id);
     }).then((val, error) => {
       if (error) {
