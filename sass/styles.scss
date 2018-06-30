@@ -378,3 +378,11 @@ nav h1 a {
 .statusMessage .success {
   background-color: #008000;
 }
+.restaurant-name-header {
+  display: flex;
+  justify-content: space-between;
+}
+.star {
+  transform: rotate(35deg);
+  cursor: pointer;
+}

@@ -29,6 +29,7 @@ class DBHelper {
                 store.createIndex('by-id', 'id');
       store.createIndex('cuisine', 'cuisine_type');
       store.createIndex('neighborhood', 'neighborhood');
+      store.createIndex('is_favorite', 'is_favorite');
     });
             }
   /**
@@ -249,6 +250,35 @@ class DBHelper {
     return marker;
   }
 
+  /**
+   * Set the restaurant as favorite
+  */
+  static setFavorite(restaurant) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("PUT", `http://localhost:1337/restaurants/${self.restaurant.id}/?is_favorite=${self.restaurant.is_favorite}`);
+      xhttp.onreadystatechange = function() {
+        if (this.status == 200) {
+          console.log('restaurantfavourited is updated !');
+        } else {
+          console.log("Failed to favourited the restaurant.");
+        }
+      };
+    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhttp.send();
+    var db = idb.open('restaurants' , 1);
+      db.then((db) => {
+        var tx = db.transaction('restaurants', 'readwrite');
+        let keyValStore = tx.objectStore('restaurants');
+        var request = keyValStore.put(restaurant);
+        request.onsuccess = function(e){
+          console.log('restaurant updated!');
+        };
+        request.onerror = function(e){
+          console.log('Error updating: '+ e);
+        };
+      });
+  }
+
 }
 
 /**
@@ -261,3 +291,4 @@ if(navigator.serviceWorker){
       console.log("can't register to the service worker.", err);
   });
 }
+

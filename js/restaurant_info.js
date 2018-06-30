@@ -76,6 +76,11 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   }
 
 
+  if(restaurant.is_favorite == "true" ) {
+    document.getElementById('favorite').setAttribute("fill", "#ffe900");
+  } else {
+    document.getElementById('favorite').setAttribute("fill", "#919191");
+  }
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
 
@@ -303,5 +308,17 @@ setStatusCode = (status, message) => {
       statusMessage.classList.remove("active");
     }, 3000);
   }
-
 };
+
+document.getElementById('favorite').addEventListener("click", function(){
+  self.restaurant.is_favorite = !self.restaurant.is_favorite;
+  DBHelper.setFavorite(self.restaurant, (error, restaurant) => {
+   console.log(error);
+   
+  });
+  if(restaurant.is_favorite) {
+    document.getElementById('favorite').setAttribute("fill", "#ffe900");
+  } else {
+    document.getElementById('favorite').setAttribute("fill", "#919191");
+  }
+});

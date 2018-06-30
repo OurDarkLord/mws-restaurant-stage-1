@@ -43,7 +43,9 @@ self.addEventListener('acitvate', function(event) {
  * Ignore the google maps fetches
  */
 self.addEventListener('fetch', function(event){
-    if (event.request.url.indexOf('localhost:1337') > 0 && event.request.url.indexOf('localhost:1337/reviews/') < 1 ) {
+    if (event.request.url.indexOf('localhost:1337') > 0 
+    && event.request.url.indexOf('localhost:1337/reviews/') < 1 
+    && event.request.url.indexOf('localhost:1337/restaurants') < 1 ) {
         if(event.request.method == "GET"){
             event.respondWith(CacheFetchExternal(event.request));
         }
