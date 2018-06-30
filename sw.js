@@ -66,49 +66,21 @@ CacheFetchExternal = (request) => {
         return cache.match(request.url).then(function(response) {
             // If there is a cached response
             if (response) {
-                // Does the cached response a Last-Modified header?
-                // If not send the cache.
-                if ( !response['Last-Modified']) {
-                    return response;
-                }
-                // Fetch only the header.
-                var newFetchResponse =  fetch(request.url, {method: 'HEAD'})
+                // Fetch the request top update the cache.
+                return fetch(request.url)
                     .then(function(res) {
                         if (!res) {
-                            return [NULL, `can't fetch ${request.url}, using cache.`];
+                            console.log(`can't fetch ${request.url}, using cache.`);
+                            return response;
                         }
-                        if ( res['Last-Modified'] ) {
-                            try {
-                                var lastModifiedVersion = Date.parse(res['Last-Modified']);
-                                var currentModifiedVersion = Date.parse(response['Last-Modified']);
-                                if ( lastModifiedVersion < currentModifiedVersion ) {
-                                    return [NULL, `Cached version is up to date`];
-                                }
-                                return fetch(request).then(function(networkResponse) {
-                                    if (!networkResponse) {
-                                        return [NULL, `can't fetch ${request.url}`];
-                                    }
-                                    // Insert the new fetch in the cache.
-                                    cache.put(request.url, networkResponse.clone());
-                                    return [networkResponse, `Response succeed`];
-                                });
-                                
-                            } catch (error) {
-                                return [NULL, `error comparing fetches`];
-                            }
-                        } else {
-                            return [NULL, `Fetch doens't have a Last-Modified header`];
-                        }
-                }).catch(function(err){
-                    return [NULL, err];
-                });
-                if ( newFetchResponse[0] == NULL ) {
-                    // If the fetch didn't succeed, send the cache.
-                    console.log(newFetchResponse[1]);
-                    return response;
-                }else {
-                    return newFetchResponse[0];
-                }
+                            // Insert the new fetch in the cache.
+                            cache.put(request.url, res.clone());
+                            return res;
+                        
+                    }).catch(function(err){
+                        console.log(`can't fetch ${request.url}, using cache.`);
+                        return response;
+                    });
                 
             } else {
                 //if there isn't a cached resonse
