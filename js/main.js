@@ -104,20 +104,45 @@ window.initMap = () => {
 var updateRestaurants = () => {
   const cSelect = document.getElementById('cuisines-select');
   const nSelect = document.getElementById('neighborhoods-select');
+  const favorite = document.getElementById('favoriteFilter').checked;
 
   const cIndex = cSelect.selectedIndex;
   const nIndex = nSelect.selectedIndex;
 
   const cuisine = cSelect[cIndex].value;
   const neighborhood = nSelect[nIndex].value;
-  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
-    if (error) { // Got an error!
-      console.error(error);
-    } else {
-      resetRestaurants(restaurants);
-      fillRestaurantsHTML();
-    }
-  });
+
+  // If only favorite is checked, get favorite restaurants.
+  if (cuisine == 'all' && neighborhood == 'all' && favorite) {
+    DBHelper.fetchRestaurantByfavorite((error, restaurants) => {
+      if (error) { // Got an error!
+        console.error(error);
+      } else {
+        resetRestaurants(restaurants);
+        fillRestaurantsHTML();
+      }
+    });
+  } else {
+    DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
+      if (error) { // Got an error!
+        console.error(error);
+      } else {
+        // If the favorite filter is enabled, check on favorite.
+        if ( favorite ) {
+          let filteredFavoriteRestaurants = [];
+          restaurants.forEach(restaurant => {
+            if ( restaurant.is_favorite == "true") {
+              filteredFavoriteRestaurants.push(restaurant);
+            }
+          });
+          restaurants = filteredFavoriteRestaurants;
+        }
+        resetRestaurants(restaurants);
+        fillRestaurantsHTML();
+        
+      }
+    });
+  }
 };
 
 /**

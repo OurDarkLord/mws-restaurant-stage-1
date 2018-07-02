@@ -146,6 +146,28 @@ class DBHelper {
     });
   }
 
+   /**
+   * Fetch restaurants by a favorite with proper error handling.
+   */
+  static fetchRestaurantByfavorite(callback) {
+    // Fetch all restaurants
+    let open = idb.open("restaurants", 1);
+    open.then((db) => {
+      let tx = db.transaction('restaurants');
+      let keyValStore = tx.objectStore('restaurants', 'readonly');
+      let favoriteIndex = keyValStore.index('is_favorite');
+      return favoriteIndex.getAll("true");
+    }).then((data, error) => {
+      if (error) {
+        callback(error, null);
+      } else {
+        callback(null, data);
+      }
+    }).catch((error) => {
+      callback(error, null);
+    });
+  }
+
   /**
    * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
    */

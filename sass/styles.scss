@@ -357,7 +357,10 @@ nav h1 a {
   width: 100%;
   text-align: center;
   color: white;
-  font-size: 2rem;
+  font-size: 1.1rem;
+  @media only screen and (min-width: 800px) {
+    font-size: 1.5rem;
+  }
   div {
     padding: 10px;
   }
@@ -385,4 +388,18 @@ nav h1 a {
 .star {
   transform: rotate(35deg);
   cursor: pointer;
+}
+.favoriteCheckbox {
+  width: 30px;
+  height: 30px;
+}
+.favoriteLabel {
+  font-size: 1.2rem;
+  color: white;
+  margin-left: 10px;
+}
+.favoriteDiv {
+  margin-left: 20px;
+  display: flex;
+  align-items: center;
 }

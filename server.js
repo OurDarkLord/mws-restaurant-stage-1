@@ -34,5 +34,5 @@ app.get('*', function(req, res, next) {
 });
 
 var server = http.createServer(app).listen(port,function(){
-	console.log("serving https op poort "+port);
+	console.log("serving http op poort " + port);
 });

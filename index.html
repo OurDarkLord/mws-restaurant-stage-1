@@ -33,6 +33,9 @@
         <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()" role="listbox" aria-label="Cuisines filter">
           <option value="all" role="option">All Cuisines</option>
         </select>
+        <div class="favoriteDiv">
+          <input type="checkbox" name="favorite" id="favoriteFilter" onclick="updateRestaurants();" class="favoriteCheckbox">  <label for="favoriteFilter" class="favoriteLabel">Favorite</label>
+        </div>
       </div>
       <ul id="restaurants-list"></ul>
     </section>
