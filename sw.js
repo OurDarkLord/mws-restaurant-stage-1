@@ -14,6 +14,7 @@ var filesToCache = [
     '/css/styles.css',
     '/js/main.js',
     '/js/restaurant_info.js',
+    '/js/idb.js',
     '/js/dbhelper.js',
 ]
 
@@ -40,15 +41,12 @@ self.addEventListener('acitvate', function(event) {
 /**
  * Intercept request and returns the cache of it.
  * If there is no cache of it, save it in cache.
- * Ignore the google maps fetches
+ * Ignore the google maps and restaurants fetches
  */
 self.addEventListener('fetch', function(event){
-    if (event.request.url.indexOf('localhost:1337') > 0 
-    && event.request.url.indexOf('localhost:1337/reviews/') < 1 
-    && event.request.url.indexOf('localhost:1337/restaurants') < 1 ) {
-        if(event.request.method == "GET"){
-            event.respondWith(CacheFetchExternal(event.request));
-        }
+    if (event.request.url.indexOf('localhost:1337') > 0  
+    && event.request.url.indexOf('localhost:1337/restaurants') < 0 && event.request.method == "GET") {
+        event.respondWith(CacheFetchExternal(event.request));
     } 
     else if (event.request.url.indexOf('localhost:8000') > 0 ) {
         event.respondWith(CacheFetch(event.request));
@@ -64,35 +62,30 @@ self.addEventListener('fetch', function(event){
 CacheFetchExternal = (request) => {
     return caches.open(CACHE_NAME_FETCHES).then(function(cache) {
         return cache.match(request.url).then(function(response) {
-            // If there is a cached response
-            if (response) {
-                // Fetch the request top update the cache.
-                return fetch(request.url)
-                    .then(function(res) {
-                        if (!res) {
+            // Fetch the request to update the cache.
+            return fetch(request.url)
+                .then(function(res) {
+                    if (!res) {
+                        if (response) {
                             console.log(`can't fetch ${request.url}, using cache.`);
                             return response;
                         }
-                            // Insert the new fetch in the cache.
-                            cache.put(request.url, res.clone());
-                            return res;
-                        
-                    }).catch(function(err){
+                        console.log('Fetch failed and there is no cached version of it.');
+                        return res;
+                    }
+                    // Insert the new fetch in the cache.
+                    cache.put(request.url, res.clone());
+                    return res;
+                    
+                }).catch(function(error){
+                    if (response) {
                         console.log(`can't fetch ${request.url}, using cache.`);
                         return response;
-                    });
-                
-            } else {
-                //if there isn't a cached resonse
-                return fetch(request).then(function(networkResponse) {
-                    if (!networkResponse) {
-                        console.log(`can't fetch ${request.url}`);
-                        return networkResponse;
                     }
-                    cache.put(request.url, networkResponse.clone());
-                    return networkResponse;
+                    console.log('Fetch failed and there is no cached version of it.');
+                    return error;
                 });
-            }
+
         });
     });
 };

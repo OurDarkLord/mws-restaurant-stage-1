@@ -1,6 +1,5 @@
 let restaurant;
 var map;
-var postReviewQueue = [];
 /**
  * Initialize Google map, called from HTML.
  */
@@ -75,12 +74,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     pictureTag.remove();
   }
 
-
-  if(restaurant.is_favorite == "true" ) {
-    document.getElementById('favorite').setAttribute("fill", "#ffe900");
-  } else {
-    document.getElementById('favorite').setAttribute("fill", "#919191");
-  }
+  setFavoriteIcon();
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
 
@@ -193,23 +187,32 @@ getParameterByName = (name, url) => {
 
 postReview = () => {
   const namepost = document.querySelector('#postName').value;
-  const radioButtons = document.querySelectorAll('.postRating');
+  let radioButtons = document.querySelectorAll('.postRating');
   const commentpost = document.querySelector('#postComment').value;
+ 
+  // Clear the boxes.
+  document.querySelector('#postName').value = "";
+  document.querySelector('#postComment').value = "";
+
   let ratingpost; 
   radioButtons.forEach(function(radiobutton) {
     if ( radiobutton.checked ) {
       ratingpost = radiobutton.value;
+      radiobutton.checked = false;
       return;
     }
   });
   const datepost = new Date();
 
   let review = {
+    restaurant_id: self.restaurant.id,
     name: namepost,
-    date: datepost.getTime(),
+    createdAt: datepost.getTime(),
     rating: ratingpost,
     comments: commentpost
   };
+
+  // Append the review to the list.
   let reviewList = document.querySelector('#reviews-list');
   if (reviewList) {
     reviewList.appendChild(createReviewHTML(review));
@@ -222,46 +225,12 @@ postReview = () => {
     let noReviewsMessage = document.querySelector('#noReviewsMessage');
     noReviewsMessage.remove();
   }
-  
-  
-  const poststring = `restaurant_id=${self.restaurant.id}&name=${namepost}&rating=${ratingpost}&comments=${commentpost}`;
-  postReviewQueue.push(poststring);
-  sendPostReview();
-};
 
-
-sendPostReview = () => {
-  failedPostReviewQueue = [];
-  postReviewQueue.forEach(function(postString) {
-    let done = false;
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://localhost:1337/reviews");
-    xhttp.onreadystatechange = function() {
-      if (this.status == 201) {
-        if (!done){
-          fetchReviews();
-          done = true;
-          setStatusCode(true, "Review succesfully posted.");
-        }
-      } else {
-        failedPostReviewQueue.push(postString);
-        setStatusCode(false, "Failed to send the review to the server.");
-      }
-    };
-
-    //for sending json
-    // xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-  
-    // xhttp.send(JSON.stringify({ 
-    //   restaurant_id: self.restaurant.id,
-    //   name: name,
-    //   rating: rating,
-    //   comments: comment
-    // }));
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhttp.send(postString);
+  // Make the call to the server and update the reviews.
+  DBHelper.postReview(review, (status) => {
+    // If the fetch is success, update all the reviews.
+    if(status) fetchReviews();
   });
-  postReviewQueue = failedPostReviewQueue;
 };
 
 /*
@@ -282,43 +251,26 @@ fetchReviews = (id =self.restaurant.id) => {
 /*
 * Set status
 */
-setStatusCode = (status, message) => {
-  const statusMessage = document.querySelector('#statusMessage');
-  statusMessage.innerHTML = '';
-  messagediv = document.createElement('div');
-  let title = document.createElement('h3');
-  if (status == true) {
-    title.innerHTML = `Review posted!`;
-    messagediv.classList.add("success");
-    messagediv.appendChild(title);
-  } else {
-    title.innerHTML = `You're offline! Resend it to the server.`;
-    let resendButton = document.createElement('button');
-    resendButton.innerHTML = 'resend';
-    resendButton.onclick = function() { sendPostReview(); };
-    messagediv.classList.add("failed");
-    messagediv.appendChild(title);
-    messagediv.appendChild(resendButton);
-  }
-  statusMessage.appendChild(messagediv);
-  statusMessage.classList.add("active");
-
-  if(status == true) {
-    setTimeout( function() {
-      statusMessage.classList.remove("active");
-    }, 3000);
-  }
-};
-
 document.getElementById('favorite').addEventListener("click", function(){
-  self.restaurant.is_favorite = !self.restaurant.is_favorite;
-  DBHelper.setFavorite(self.restaurant, (error, restaurant) => {
-   console.log(error);
-   
-  });
-  if(restaurant.is_favorite) {
+
+  if(restaurant.is_favorite === "true") { 
+    self.restaurant.is_favorite = "false";
+  } else {
+    self.restaurant.is_favorite = "true";
+  }
+
+  DBHelper.setFavorite(self.restaurant);
+
+  setFavoriteIcon();
+});
+
+/*
+* Set favourite icon
+*/
+setFavoriteIcon = () => {
+  if(restaurant.is_favorite === "true") {
     document.getElementById('favorite').setAttribute("fill", "#ffe900");
   } else {
     document.getElementById('favorite').setAttribute("fill", "#919191");
   }
-});
+};

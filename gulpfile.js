@@ -24,7 +24,7 @@ var cleanCSS = require('gulp-clean-css');		 //minify css + backwards compatible
 
 
 gulp.task( 'delete-dist',['clean']);
-gulp.task( 'build-dist',['styles', 'copy-html','images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb','copy-sw']);
+gulp.task( 'build-dist',['styles', 'copy-html', 'icons-compress', 'images-compress', 'lint' ,'scripts','copy-manifest', 'build', 'idb','copy-sw']);
 //gulp.task( 'build-sw',[ 'generate-service-worker']);
 
 
@@ -85,6 +85,16 @@ gulp.task('images-compress', function() {
 		}))
 		.pipe(gzip())
         .pipe(gulp.dest('dist/img'));
+});
+
+gulp.task('icons-compress', function() {
+    return gulp.src('img/icons/*')
+        .pipe(imagemin({
+            progressive: true,
+            use: [pngquant({quality: '10'}, {verbose: true})]
+		}))
+		.pipe(gzip())
+        .pipe(gulp.dest('dist/img/icons'));
 });
 
 gulp.task('build', function () {
